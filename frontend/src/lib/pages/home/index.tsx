@@ -1,16 +1,12 @@
-import { Grid } from '@chakra-ui/react';
-
 import { CTASection } from './components/cta-section';
-import { SomeImage } from './components/some-image';
 import { SomeText } from './components/some-text';
 
 const Home = () => {
   return (
-    <Grid gap={4}>
+    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-8 text-center">
       <SomeText />
-      <SomeImage />
       <CTASection />
-    </Grid>
+    </div>
   );
 };
 

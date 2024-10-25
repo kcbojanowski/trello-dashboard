@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import million from 'million/compiler';
 import { visualizer } from 'rollup-plugin-visualizer';
 import type { PluginOption } from 'vite';
@@ -7,12 +7,12 @@ import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import type { VitePWAOptions } from 'vite-plugin-pwa';
 import { VitePWA } from 'vite-plugin-pwa';
-import tsconfigPaths from 'vite-tsconfig-paths';
+import tsConfigPaths from 'vite-tsconfig-paths';
 
 const pwaOptions: Partial<VitePWAOptions> = {
   registerType: 'autoUpdate',
   manifest: {
-    short_name: 'vite-react-chakra-starter',
+    short_name: 'vite-react-tailwind-starter',
     name: 'Vite React App Template',
     lang: 'en',
     start_url: '/',
@@ -40,7 +40,7 @@ export default defineConfig({
       typescript: true,
       biome: true,
     }),
-    tsconfigPaths(),
+    tsConfigPaths(),
     visualizer({ template: 'sunburst' }) as unknown as PluginOption,
     VitePWA(pwaOptions),
   ],

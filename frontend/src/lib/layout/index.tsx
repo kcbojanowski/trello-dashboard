@@ -1,5 +1,6 @@
-import { Box, Flex } from '@chakra-ui/react';
 import type { ReactNode } from 'react';
+
+import { ThemeProvider } from '@/lib/components/theme-provider';
 
 import { Footer } from './components/footer';
 import { Header } from './components/header';
@@ -11,15 +12,13 @@ type LayoutProps = {
 
 export const Layout = ({ children }: LayoutProps) => {
   return (
-    <Box margin="0 auto" maxWidth={800} transition="0.5s ease-out">
+    <ThemeProvider>
       <Meta />
-      <Flex wrap="wrap" margin="8" minHeight="90vh">
+      <div className="flex min-h-screen flex-col dark:bg-black dark:text-white">
         <Header />
-        <Box width="full" as="main" marginY={22}>
-          {children}
-        </Box>
+        <main className="wrapper">{children}</main>
         <Footer />
-      </Flex>
-    </Box>
+      </div>
+    </ThemeProvider>
   );
 };

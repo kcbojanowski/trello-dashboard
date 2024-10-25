@@ -55,7 +55,6 @@
         }
       },
       "suspicious": {
-        "noConsole": "error",
         "noConsoleLog": "error",
         "noEmptyBlockStatements": "error",
         "useAwait": "error"
@@ -69,7 +68,7 @@
   },
   "overrides": [
     {
-      "include": ["src/lib/pages/**/*", "*.ts"],
+      "include": ["src/lib/pages/**/index.tsx", "*.ts"],
       "linter": {
         "rules": {
           "style": {
