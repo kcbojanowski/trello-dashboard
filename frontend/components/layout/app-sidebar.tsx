@@ -41,6 +41,7 @@ import {
   ChevronsUpDown,
   CreditCard,
   GalleryVerticalEnd,
+  Kanban,
   LogOut
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -54,9 +55,9 @@ import ThemeToggle from './ThemeToggle/theme-toggle';
 import { UserNav } from './user-nav';
 
 export const company = {
-  name: 'Acme Inc',
-  logo: GalleryVerticalEnd,
-  plan: 'Enterprise'
+  name: 'Trello Review',
+  logo: Kanban,
+  plan: 'Free'
 };
 
 export default function AppSidebar({
