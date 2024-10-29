@@ -1,6 +1,6 @@
 ## Overview
 
-This is a starter template using the following stack:
+Frontend stack:
 
 - Framework - [Next.js 14](https://nextjs.org/13)
 - Language - [TypeScript](https://www.typescriptlang.org)
@@ -32,7 +32,7 @@ This is a starter template using the following stack:
 
 ## Getting Started
 
-Follow these steps to clone the repository and start the development server:
+Follow these steps:
 
 - Go to frontend directory `cd frontend`
 - `npm install`
