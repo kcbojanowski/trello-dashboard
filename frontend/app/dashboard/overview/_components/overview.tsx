@@ -3,7 +3,7 @@ import { BarGraph } from './bar-graph';
 import { PieGraph } from './pie-graph';
 import { CalendarDateRangePicker } from '@/components/date-range-picker';
 import PageContainer from '@/components/layout/page-container';
-import { RecentSales } from './recent-sales';
+import { RecentChanges } from './recent-changes';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -13,18 +13,22 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import NumberTicker from '@/components/ui/number-ticker';
+import BlurFade from '@/components/ui/blur-fade';
 
 export default function OverViewPage() {
   return (
     <PageContainer scrollable>
       <div className="space-y-2">
         <div className="flex items-center justify-between space-y-2">
+          <BlurFade delay={0.25} inView>
           <h2 className="text-2xl font-bold tracking-tight">
             Hi, Welcome back 👋
           </h2>
+          </BlurFade>
           <div className="hidden items-center space-x-2 md:flex">
             <CalendarDateRangePicker />
-            <Button>Download</Button>
+            <Button >Download</Button>
           </div>
         </div>
         <Tabs defaultValue="overview" className="space-y-4">
@@ -56,7 +60,7 @@ export default function OverViewPage() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">69</div>
+                  <div className="text-2xl font-bold"><NumberTicker value={69} decimalPlaces={0} /></div>
                   <p className="text-xs text-muted-foreground">
                     +20.1% from last month
                   </p>
@@ -83,7 +87,7 @@ export default function OverViewPage() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">51.3%</div>
+                  <div className="text-2xl font-bold">5.67%</div>
                   <p className="text-xs text-muted-foreground">
                     +13.1% from last month
                   </p>
@@ -110,7 +114,7 @@ export default function OverViewPage() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">12</div>
+                  <div className="text-2xl font-bold"><NumberTicker value={12} decimalPlaces={0} /></div>
                   <p className="text-xs text-muted-foreground">
                     30 done last month
                   </p>
@@ -137,7 +141,7 @@ export default function OverViewPage() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">123</div>
+                  <div className="text-2xl font-bold"><NumberTicker value={123} decimalPlaces={0} /></div>
                   <p className="text-xs text-muted-foreground">
                     3% more than last month
                   </p>
@@ -156,7 +160,7 @@ export default function OverViewPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <RecentSales />
+                  <RecentChanges />
                 </CardContent>
               </Card>
               <div className="col-span-4">

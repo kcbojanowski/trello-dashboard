@@ -7,8 +7,8 @@ import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
-  description: 'Basic dashboard with Next.js and Shadcn'
+  title: 'Trello Dashboard',
+  description: 'Dashboard using Trello API for real-time insights into task progress and team performance in Agile projects'
 };
 
 const lato = Lato({
