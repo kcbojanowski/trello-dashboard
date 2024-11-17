@@ -15,7 +15,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import NumberTicker from '@/components/ui/number-ticker';
 import BlurFade from '@/components/ui/blur-fade';
-import {UsernameDialog} from "@/app/dashboard/overview/_components/UsernameDialog";
+import {UserBoardsDialog} from "@/app/dashboard/overview/_components/UserBoardsDialog";
+import {BoardUsersDialog} from "@/app/dashboard/overview/_components/BoardUsersDialog";
 
 export default function OverViewPage() {
   return (
@@ -32,7 +33,9 @@ export default function OverViewPage() {
             <Button >Download</Button>
           </div>
         </div>
-        <UsernameDialog />
+        <UserBoardsDialog />
+        <br />
+        <BoardUsersDialog />
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
