@@ -11,41 +11,41 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {useTrelloBoards} from "@/hooks/useMetrics";
+import {useBoardUsers} from "@/hooks/useMetrics";
 import React, {useState} from "react";
 
-export function UsernameDialog() {
-    const [username, setUsername] = useState("");
-    const { getBoards, boards, isPending, isError, error } = useTrelloBoards();
+export function BoardUsersDialog() {
+    const [boardId, setBoardId] = useState("");
+    const { getUsers, users, isPending, isError, error } = useBoardUsers();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        getBoards(username);
+        getUsers(boardId);
     };
 
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button>Select you dashboard</Button>
+                <Button>Check users</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Type in your Trello username</DialogTitle>
+                    <DialogTitle>Type in board id</DialogTitle>
                 </DialogHeader>
                 <DialogDescription>
-                    Type in your Trello username and select board you want to get metrics from
+                    Type in board id to see its users
                 </DialogDescription>
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-4 py-4">
                         <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="username" className="text-right">
-                                Username
+                            <Label htmlFor="boardId" className="text-right">
+                                Board id
                             </Label>
                             <Input
-                                id="username"
+                                id="boardId"
                                 className="col-span-3"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
+                                value={boardId}
+                                onChange={(e) => setBoardId(e.target.value)}
                             />
                         </div>
                     </div>
@@ -60,17 +60,17 @@ export function UsernameDialog() {
                         {error?.message || "Something went wrong. Please try again."}
                     </p>
                 )}
-                {boards && (
+                {users && (
                     <div>
-                        <h3>Boards:</h3>
-                        {boards.length > 0 ? (
+                        <h3>Users:</h3>
+                        {users.length > 0 ? (
                             <ul>
-                                {boards.map((board) => (
-                                    <li key={board.id}>{board.name}</li>
+                                {users.map((user) => (
+                                    <li key={user.id}>{user.fullName} ({user.username})</li>
                                 ))}
                             </ul>
                         ) : (
-                            <b style={{ color: "gray" }}>User has no boards :(</b>
+                            <b style={{ color: "gray" }}>Board has no users :(</b>
                         )}
                     </div>
                 )}
