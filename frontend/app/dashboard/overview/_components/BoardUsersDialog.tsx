@@ -11,16 +11,25 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {useBoardUsers} from "@/hooks/useMetrics";
+import {useBoardLists, useBoardUsers} from "@/hooks/useMetrics";
 import React, {useState} from "react";
+import {getUsersCardCount} from "@/app/dashboard/overview/_components/metrics/utils";
 
 export function BoardUsersDialog() {
     const [boardId, setBoardId] = useState("");
     const { getUsers, users, isPending, isError, error } = useBoardUsers();
+    const {
+        getLists,
+        listsWithCards,
+        isPending: isListPending,
+        isError: isListError,
+        error: listError,
+    } = useBoardLists();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         getUsers(boardId);
+        getLists(boardId)
     };
 
     return (
@@ -50,31 +59,50 @@ export function BoardUsersDialog() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit" disabled={isPending}>
+                        <Button type="submit" disabled={isPending || isListPending}>
                             {isPending ? "Loading..." : "Save changes"}
                         </Button>
                     </DialogFooter>
                 </form>
-                {isError && (
+                {(isError || isListError) && (
                     <p style={{ color: "red" }}>
-                        {error?.message || "Something went wrong. Please try again."}
+                        {error?.message || listError?.message || "Something went wrong. Please try again."}
                     </p>
                 )}
-                {users && (
+                {users && listsWithCards && (
                     <div>
                         <h3>Users:</h3>
                         {users.length > 0 ? (
-                            <ul>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th className="border border-gray-300 px-4 py-2">Full name</th>
+                                    <th className="border border-gray-300 px-4 py-2">Username</th>
+                                    <th className="border border-gray-300 px-4 py-2">Tasks count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
                                 {users.map((user) => (
-                                    <li key={user.id}>{user.fullName} ({user.username})</li>
+                                    <tr key={user.id}>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {user.fullName}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {user.username}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {getUsersCardCount(user, listsWithCards)}
+                                        </td>
+                                    </tr>
                                 ))}
-                            </ul>
+                                </tbody>
+                            </table>
                         ) : (
-                            <b style={{ color: "gray" }}>Board has no users :(</b>
+                            <b style={{color: "gray"}}>Board has no users :(</b>
                         )}
                     </div>
                 )}
             </DialogContent>
         </Dialog>
-)
+    )
 }

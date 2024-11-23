@@ -1,6 +1,6 @@
 import {
     fetchBoardUpdateCardActions,
-    fetchBoardUsers,
+    fetchBoardUsers, fetchCardsOnList,
     fetchListsWithCards,
     fetchTrelloBoards
 } from "@/app/api/metrics/actions";
@@ -61,3 +61,19 @@ export const useBoardUpdateCardActions = () => {
         error,
     }
 }
+
+export const useCardsOnList = () => {
+    const { mutate: getCards, data, isPending, isError, error } = useMutation({
+        mutationFn: (listId: string) => fetchCardsOnList(listId),
+    })
+
+    return {
+        getCards,
+        cards: data,
+        isPending,
+        isError,
+        error,
+    }
+}
+
+
