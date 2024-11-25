@@ -1,6 +1,6 @@
 import {Action} from "@/app/types";
 
-const parseHoursToString = (meanInHours: number): string => {
+export const parseHoursToString = (meanInHours: number): string => {
     if (meanInHours > 24) {
         const meanInDays = meanInHours / 24
         return `${parseFloat(meanInDays.toFixed(2))} days`;
