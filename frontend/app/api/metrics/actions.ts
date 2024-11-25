@@ -40,7 +40,7 @@ export const fetchListsWithCards = async (boardId: string): Promise<ListWithCard
         throw new Error('API key or token not found.')
     }
 
-    const response = await fetch(`https://api.trello.com/1/boards/${boardId}/lists?cards=open&card_fields=id,name,due,dueComplete,idMembers&fields=id,name&key=${apiKey}&token=${apiToken}`)
+    const response = await fetch(`https://api.trello.com/1/boards/${boardId}/lists?cards=open&card_fields=id,name,due,dueComplete,start,idMembers&fields=id,name&key=${apiKey}&token=${apiToken}`)
 
     if (response.status == 404) {
         throw new Error('Board not found')
@@ -51,15 +51,33 @@ export const fetchListsWithCards = async (boardId: string): Promise<ListWithCard
     return response.json()
 }
 
-export const fetchBoardUpdateCardActions = async (boardId: string): Promise<Action[]> => {
+export const fetchBoardCardActions = async (boardId: string, filter?: string): Promise<Action[]> => {
     if (!apiKey || !apiToken) {
         throw new Error('API key or token not found.')
     }
 
-    const response = await fetch(`https://api.trello.com/1/boards/${boardId}/actions?fields=data,date&filter=updateCard&memberCreator_fields=id,fullName,username&limit=1000&key=${apiKey}&token=${apiToken}`)
+    filter = filter ? filter : "updateCard"
+
+    const response = await fetch(`https://api.trello.com/1/boards/${boardId}/actions?fields=data,date&filter=${filter}&memberCreator_fields=id,fullName,username&limit=1000&key=${apiKey}&token=${apiToken}`)
 
     if (response.status == 404) {
         throw new Error('Board not found')
+    } else if (!response.ok) {
+        throw new Error('Failed to fetch data.')
+    }
+
+    return response.json()
+}
+
+export const fetchListsUpdateCardActions = async (listId: string): Promise<Action[]> => {
+    if (!apiKey || !apiToken) {
+        throw new Error('API key or token not found.')
+    }
+
+    const response = await fetch(`https://api.trello.com/1/lists/${listId}/actions?fields=data,date&filter=updateCard&limit=1000&memberCreator=false&key=${apiKey}&token=${apiToken}`)
+
+    if (response.status == 404) {
+        throw new Error('List not found')
     } else if (!response.ok) {
         throw new Error('Failed to fetch data.')
     }

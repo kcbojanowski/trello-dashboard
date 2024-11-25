@@ -1,10 +1,14 @@
 import {
-    fetchBoardUpdateCardActions,
-    fetchBoardUsers, fetchCardsOnList,
+    fetchBoardCardActions,
+    fetchBoardUsers,
+    fetchCardsOnList,
+    fetchListsUpdateCardActions,
     fetchListsWithCards,
     fetchTrelloBoards
 } from "@/app/api/metrics/actions";
 import {useMutation} from "@tanstack/react-query";
+import {useState} from "react";
+import {Action, ListWithCards} from "@/app/types";
 
 export const useTrelloBoards = () => {
     const { mutate: getBoards, data, isPending, isError, error } = useMutation({
@@ -48,9 +52,10 @@ export const useBoardLists = () => {
     }
 }
 
-export const useBoardUpdateCardActions = () => {
-    const { mutate: getActions, data, isPending, isError, error } = useMutation({
-        mutationFn: (boardId: string) => fetchBoardUpdateCardActions(boardId),
+export const useBoardUpdateCardActions = (isCreateFilter?: boolean) => {
+    const {mutate: getActions, data, isPending, isError, error} = useMutation({
+        mutationFn: (boardId: string) =>
+            fetchBoardCardActions(boardId, isCreateFilter ? "createCard" : undefined),
     })
 
     return {

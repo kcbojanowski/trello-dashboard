@@ -11,34 +11,42 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {useBoardLists, useBoardUpdateCardActions} from "@/hooks/useMetrics";
+import {useBoardLists, useBoardUpdateCardActions} from "@/hooks/metrics/useMetrics";
 import React, {useState} from "react";
-import ListSummary from "@/app/dashboard/overview/_components/metrics/ListsSummary";
-import {Separator} from "@/components/ui/separator";
 import RecentTasksClosed from "@/app/dashboard/overview/_components/metrics/RecentTasksClosed";
+import ListsSummary from "@/app/dashboard/overview/_components/metrics/ListsSummary";
 
 export function BoardMetricsDialog() {
     const [boardId, setBoardId] = useState("");
     const {
         getLists,
         listsWithCards,
-        isPending,
-        isError,
-        error
+        isPending: isListsPending,
+        isError: isListsError,
+        error: listError
     } = useBoardLists();
 
     const {
-        getActions,
-        actions,
-        isPending: isActionsPending,
-        isError: isActionsError,
-        error: actionsError
+        getActions: getUpdateActions,
+        actions: updateActions,
+        isPending: isUpdateActionsPending,
+        isError: isUpdateActionsError,
+        error: updateActionsError
     } = useBoardUpdateCardActions();
+
+    const {
+        getActions: getCreateActions,
+        actions: createActions,
+        isPending: isCreateActionsPending,
+        isError: isCreateActionsError,
+        error: createActionsError
+    } = useBoardUpdateCardActions(true);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         getLists(boardId);
-        getActions(boardId)
+        getUpdateActions(boardId)
+        getCreateActions(boardId)
     };
 
     return (
@@ -68,22 +76,26 @@ export function BoardMetricsDialog() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit" disabled={isPending}>
-                            {isPending ? "Loading..." : "Apply"}
+                        <Button type="submit" disabled={isListsPending}>
+                            {isListsPending ? "Loading..." : "Apply"}
                         </Button>
                     </DialogFooter>
                 </form>
-                <ListSummary
+                <ListsSummary
                     lists={listsWithCards}
-                    isError={isError}
-                    error={error}
+                    createActions={createActions}
+                    updateActions={updateActions}
+                    isListsError={isListsError}
+                    listsError={listError}
+                    isActionsPending={isCreateActionsPending}
+                    isActionsError={isCreateActionsError}
+                    actionsError={createActionsError}
                 />
-                {listsWithCards && <Separator/>}
                 <RecentTasksClosed
-                    actions={actions}
-                    isError={isActionsError}
-                    error={actionsError}
-                    isPending={isActionsPending}
+                    actions={updateActions}
+                    isError={isUpdateActionsError}
+                    error={updateActionsError}
+                    isPending={isUpdateActionsPending}
                 />
             </DialogContent>
         </Dialog>

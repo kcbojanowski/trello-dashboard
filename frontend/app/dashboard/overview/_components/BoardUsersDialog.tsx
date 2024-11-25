@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {useBoardLists, useBoardUsers} from "@/hooks/useMetrics";
+import {useBoardLists, useBoardUsers} from "@/hooks/metrics/useMetrics";
 import React, {useState} from "react";
 import {getUsersCardCount} from "@/app/dashboard/overview/_components/metrics/utils";
 
