@@ -41,3 +41,7 @@ export type Action = {
     date: string
     memberCreator: User
 }
+
+export type ActionsCount = {
+    _value: number
+}

@@ -1,4 +1,4 @@
-import {ListWithCards, User} from "@/app/types";
+import {Action, ListWithCards, User} from "@/app/types";
 
 export type CardWithTimeLeft = {
     name: string;
@@ -24,4 +24,14 @@ export const getUpcomingCards = (listsWithCards: ListWithCards[]): CardWithTimeL
             timeLeftInHours: ((new Date(card.due).getTime() - now) / (1000 * 3600)),
         }))
         .sort((a, b) => a.timeLeftInHours - b.timeLeftInHours);
+};
+
+export const countActionsInLastDays = (actions: Action[], days: number): number => {
+    const now = Date.now();
+    const daysAgo = now - days * 24 * 60 * 60 * 1000;
+
+    return actions.filter((action) => {
+        const actionDate = new Date(action.date).getTime();
+        return actionDate >= daysAgo && actionDate <= now;
+    }).length;
 };

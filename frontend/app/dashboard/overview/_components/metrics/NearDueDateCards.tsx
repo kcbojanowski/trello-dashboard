@@ -1,7 +1,6 @@
 import React from 'react';
 import {ListWithCards} from "@/app/types";
 import {parseHoursToString,} from "@/app/dashboard/overview/_components/metrics/meanTimeInListUtils";
-import {Loader2} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
 import {getUpcomingCards} from "@/app/dashboard/overview/_components/metrics/utils";
 
@@ -28,8 +27,6 @@ const NearDueDateCards: React.FC<Props> = (
             </p>
         )
     }
-
-    if (isListsError) return (<Loader2 className="animate-spin"/>)
 
     const cardsWithTimeLeft = getUpcomingCards(lists)
 

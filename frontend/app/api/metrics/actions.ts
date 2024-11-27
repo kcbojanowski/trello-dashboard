@@ -1,4 +1,4 @@
-import {Action, Board, Card, ListWithCards, User} from "@/app/types";
+import {Action, ActionsCount, Board, ListWithCards, User} from "@/app/types";
 
 const apiKey = process.env.NEXT_PUBLIC_TRELLO_API_KEY
 const apiToken = process.env.NEXT_PUBLIC_TRELLO_API_TOKEN
@@ -69,15 +69,15 @@ export const fetchBoardCardActions = async (boardId: string, filter?: string): P
     return response.json()
 }
 
-export const fetchListsUpdateCardActions = async (listId: string): Promise<Action[]> => {
+export const fetchUserActionsCount = async (userId: string): Promise<ActionsCount> => {
     if (!apiKey || !apiToken) {
         throw new Error('API key or token not found.')
     }
 
-    const response = await fetch(`https://api.trello.com/1/lists/${listId}/actions?fields=data,date&filter=updateCard&limit=1000&memberCreator=false&key=${apiKey}&token=${apiToken}`)
+    const response = await fetch(`https://api.trello.com/1/members/${userId}/actions?format=count&limit=1000&key=${apiKey}&token=${apiToken}`)
 
     if (response.status == 404) {
-        throw new Error('List not found')
+        throw new Error('User not found')
     } else if (!response.ok) {
         throw new Error('Failed to fetch data.')
     }
@@ -85,18 +85,16 @@ export const fetchListsUpdateCardActions = async (listId: string): Promise<Actio
     return response.json()
 }
 
-export const fetchCardsOnList = async (listId: string): Promise<Card[]> => {
-    if (!apiKey || !apiToken) {
-        throw new Error('API key or token not found.')
-    }
+export const fetchUsersActionsMap = async (users: User[]): Promise<Record<string, number>> => {
+    const counts = await Promise.all(
+        users.map(async (user) => {
+            const result = await fetchUserActionsCount(user.id);
+            return { userId: user.id, count: result._value };
+        })
+    );
 
-    const response = await fetch(`https://api.trello.com/1/lists/${listId}/cards?fields=id,name,start,due,dueComplete,idMembers&key=${apiKey}&token=${apiToken}`)
-
-    if (response.status == 404) {
-        throw new Error('List not found')
-    } else if (!response.ok) {
-        throw new Error('Failed to fetch data.')
-    }
-
-    return response.json()
-}
+    return counts.reduce((acc, { userId, count }) => {
+        acc[userId] = count;
+        return acc;
+    }, {} as Record<string, number>);
+};

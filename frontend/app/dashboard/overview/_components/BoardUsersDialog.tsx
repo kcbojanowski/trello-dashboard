@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {useBoardLists, useBoardUsers} from "@/hooks/metrics/useMetrics";
-import React, {useState} from "react";
+import {useBoardLists, useBoardUsers, useUsersActionsMap} from "@/hooks/metrics/useMetrics";
+import React, {useEffect, useState} from "react";
 import {getUsersCardCount} from "@/app/dashboard/overview/_components/metrics/utils";
+import {Loader2} from "lucide-react";
 
 export function BoardUsersDialog() {
     const [boardId, setBoardId] = useState("");
@@ -26,6 +27,14 @@ export function BoardUsersDialog() {
         error: listError,
     } = useBoardLists();
 
+    const { actionCounts, isFetching: isActionsCountFetching, fetchActionsMap } = useUsersActionsMap();
+
+    useEffect(() => {
+        if (users) {
+            fetchActionsMap(users)
+        }
+    }, [users]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         getUsers(boardId);
@@ -37,7 +46,7 @@ export function BoardUsersDialog() {
             <DialogTrigger asChild>
                 <Button>Check users</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Type in board id</DialogTitle>
                 </DialogHeader>
@@ -69,7 +78,7 @@ export function BoardUsersDialog() {
                         {error?.message || listError?.message || "Something went wrong. Please try again."}
                     </p>
                 )}
-                {users && listsWithCards && (
+                {users && (
                     <div>
                         <h3>Users:</h3>
                         {users.length > 0 ? (
@@ -79,6 +88,7 @@ export function BoardUsersDialog() {
                                     <th className="border border-gray-300 px-4 py-2">Full name</th>
                                     <th className="border border-gray-300 px-4 py-2">Username</th>
                                     <th className="border border-gray-300 px-4 py-2">Tasks count</th>
+                                    <th className="border border-gray-300 px-4 py-2">Actions count</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -91,7 +101,12 @@ export function BoardUsersDialog() {
                                             {user.username}
                                         </td>
                                         <td className="border border-gray-300 px-4 py-2">
-                                            {getUsersCardCount(user, listsWithCards)}
+                                            {isListPending && <Loader2 className="animate-spin"/>}
+                                            {listsWithCards && getUsersCardCount(user, listsWithCards)}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {isActionsCountFetching && <Loader2 className="animate-spin"/>}
+                                            {!isActionsCountFetching && actionCounts[user.id]}
                                         </td>
                                     </tr>
                                 ))}

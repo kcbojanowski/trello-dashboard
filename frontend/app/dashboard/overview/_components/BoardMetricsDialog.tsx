@@ -16,6 +16,8 @@ import React, {useState} from "react";
 import RecentTasksClosed from "@/app/dashboard/overview/_components/metrics/RecentTasksClosed";
 import ListsSummary from "@/app/dashboard/overview/_components/metrics/ListsSummary";
 import NearDueDateCards from "@/app/dashboard/overview/_components/metrics/NearDueDateCards";
+import {countActionsInLastDays} from "@/app/dashboard/overview/_components/metrics/utils";
+import {Separator} from "@/components/ui/separator";
 
 export function BoardMetricsDialog() {
     const [boardId, setBoardId] = useState("");
@@ -92,6 +94,14 @@ export function BoardMetricsDialog() {
                     isActionsError={isCreateActionsError}
                     actionsError={createActionsError}
                 />
+                {createActions && (
+                    <div>
+                        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
+                            Task created in last 7 days: {countActionsInLastDays(createActions, 7)}
+                        </h4>
+                        <Separator/>
+                    </div>
+                )}
                 <NearDueDateCards lists={listsWithCards} isListsError={isListsError} listsError={listError} />
                 <RecentTasksClosed
                     actions={updateActions}

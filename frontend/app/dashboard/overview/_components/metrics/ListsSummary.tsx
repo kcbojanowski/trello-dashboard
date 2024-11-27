@@ -30,7 +30,12 @@ const ListsSummary: React.FC<Props> = (
     }
 ) => {
 
-    if (!(createActions && updateActions && lists)) return
+    if (isActionsPending) return (
+        <div>
+            <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">Total tasks </h4>
+            <Loader2 className="animate-spin"/>
+        </div>
+    )
 
     if (isListsError || isActionsError) {
         return (
@@ -40,7 +45,7 @@ const ListsSummary: React.FC<Props> = (
         )
     }
 
-    if (isActionsPending) return (<Loader2 className="animate-spin"/>)
+    if (!(createActions && updateActions && lists)) return
 
     if (lists.length === 0) {
         return <b style={{color: 'gray'}}>Board has no lists :(</b>;
