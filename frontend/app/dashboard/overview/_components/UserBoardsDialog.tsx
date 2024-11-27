@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {useTrelloBoards} from "@/hooks/useMetrics";
+import {useTrelloBoards} from "@/hooks/metrics/useMetrics";
 import React, {useState} from "react";
 
 export function UserBoardsDialog() {

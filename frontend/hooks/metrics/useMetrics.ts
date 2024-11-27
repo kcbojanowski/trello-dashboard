@@ -1,10 +1,12 @@
 import {
-    fetchBoardUpdateCardActions,
+    fetchBoardCardActions,
     fetchBoardUsers,
     fetchListsWithCards,
-    fetchTrelloBoards
+    fetchTrelloBoards, fetchUsersActionsMap
 } from "@/app/api/metrics/actions";
 import {useMutation} from "@tanstack/react-query";
+import {User} from "@/app/types";
+import {useState} from "react";
 
 export const useTrelloBoards = () => {
     const { mutate: getBoards, data, isPending, isError, error } = useMutation({
@@ -48,9 +50,10 @@ export const useBoardLists = () => {
     }
 }
 
-export const useBoardUpdateCardActions = () => {
-    const { mutate: getActions, data, isPending, isError, error } = useMutation({
-        mutationFn: (boardId: string) => fetchBoardUpdateCardActions(boardId),
+export const useBoardUpdateCardActions = (isCreateFilter?: boolean) => {
+    const {mutate: getActions, data, isPending, isError, error} = useMutation({
+        mutationFn: (boardId: string) =>
+            fetchBoardCardActions(boardId, isCreateFilter ? "createCard" : undefined),
     })
 
     return {
@@ -61,3 +64,21 @@ export const useBoardUpdateCardActions = () => {
         error,
     }
 }
+
+export const useUsersActionsMap = () => {
+    const [actionCounts, setActionCounts] = useState<Record<string, number>>({});
+    const [isFetching, setIsFetching] = useState(false);
+
+    const fetchActionsMap = async (users: User[]) => {
+        setIsFetching(true);
+        try {
+            const countsMap = await fetchUsersActionsMap(users);
+            setActionCounts(countsMap);
+        } finally {
+            setIsFetching(false);
+        }
+    };
+
+    return { actionCounts, isFetching, fetchActionsMap };
+};
+
