@@ -97,7 +97,7 @@ export function BoardMetricsDialog() {
                 {createActions && (
                     <div>
                         <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-                            Task created in last 7 days: {countActionsInLastDays(createActions, 7)}
+                            Tasks created in last 30 days: {countActionsInLastDays(createActions, 30)}
                         </h4>
                         <Separator/>
                     </div>
