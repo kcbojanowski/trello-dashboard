@@ -6,6 +6,10 @@ export type Board = {
 export type Card = {
     id: string
     name: string
+    start: string
+    due: string
+    dueComplete: boolean
+    idMembers: string[]
 }
 
 export type TrelloList = {
@@ -36,4 +40,8 @@ export type Action = {
     data: ActionData
     date: string
     memberCreator: User
+}
+
+export type ActionsCount = {
+    _value: number
 }
