@@ -11,16 +11,34 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {useBoardUsers} from "@/hooks/useMetrics";
-import React, {useState} from "react";
+import {useBoardLists, useBoardUsers, useUsersActionsMap} from "@/hooks/metrics/useMetrics";
+import React, {useEffect, useState} from "react";
+import {getUsersCardCount} from "@/app/dashboard/overview/_components/metrics/utils";
+import {Loader2} from "lucide-react";
 
 export function BoardUsersDialog() {
     const [boardId, setBoardId] = useState("");
     const { getUsers, users, isPending, isError, error } = useBoardUsers();
+    const {
+        getLists,
+        listsWithCards,
+        isPending: isListPending,
+        isError: isListError,
+        error: listError,
+    } = useBoardLists();
+
+    const { actionCounts, isFetching: isActionsCountFetching, fetchActionsMap } = useUsersActionsMap();
+
+    useEffect(() => {
+        if (users) {
+            fetchActionsMap(users)
+        }
+    }, [users]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         getUsers(boardId);
+        getLists(boardId)
     };
 
     return (
@@ -28,7 +46,7 @@ export function BoardUsersDialog() {
             <DialogTrigger asChild>
                 <Button>Check users</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Type in board id</DialogTitle>
                 </DialogHeader>
@@ -50,31 +68,56 @@ export function BoardUsersDialog() {
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit" disabled={isPending}>
+                        <Button type="submit" disabled={isPending || isListPending}>
                             {isPending ? "Loading..." : "Save changes"}
                         </Button>
                     </DialogFooter>
                 </form>
-                {isError && (
+                {(isError || isListError) && (
                     <p style={{ color: "red" }}>
-                        {error?.message || "Something went wrong. Please try again."}
+                        {error?.message || listError?.message || "Something went wrong. Please try again."}
                     </p>
                 )}
                 {users && (
                     <div>
                         <h3>Users:</h3>
                         {users.length > 0 ? (
-                            <ul>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th className="border border-gray-300 px-4 py-2">Full name</th>
+                                    <th className="border border-gray-300 px-4 py-2">Username</th>
+                                    <th className="border border-gray-300 px-4 py-2">Tasks count</th>
+                                    <th className="border border-gray-300 px-4 py-2">Actions count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
                                 {users.map((user) => (
-                                    <li key={user.id}>{user.fullName} ({user.username})</li>
+                                    <tr key={user.id}>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {user.fullName}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {user.username}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {isListPending && <Loader2 className="animate-spin"/>}
+                                            {listsWithCards && getUsersCardCount(user, listsWithCards)}
+                                        </td>
+                                        <td className="border border-gray-300 px-4 py-2">
+                                            {isActionsCountFetching && <Loader2 className="animate-spin"/>}
+                                            {!isActionsCountFetching && actionCounts[user.id]}
+                                        </td>
+                                    </tr>
                                 ))}
-                            </ul>
+                                </tbody>
+                            </table>
                         ) : (
-                            <b style={{ color: "gray" }}>Board has no users :(</b>
+                            <b style={{color: "gray"}}>Board has no users :(</b>
                         )}
                     </div>
                 )}
             </DialogContent>
         </Dialog>
-)
+    )
 }
