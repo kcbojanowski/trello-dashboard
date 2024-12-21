@@ -1,107 +1,88 @@
-import {Action, ListWithCards, User} from "@/app/types";
+import { Action, CardWithTimeLeft, ListWithCards, Metrics, User } from '@/app/types';
 import {
     getListCardsMeanTime,
     getSumOfMeanTimes
 } from '@/app/dashboard/overview/_components/metrics/meanTimeInListUtils';
 
-export type CardWithTimeLeft = {
-    name: string;
-    timeLeftInHours: number;
-};
-
-export type Metrics = {
-    totalActiveCards: number;
-    averageTaskCompletionTime: string;
-    pendingTasks: number;
-    totalCompletedCards: number;
-    recentTasksDone: {
-        cardName: string;
-        completedBy: string;
-        completedOn: string;
-    }[];
-};
-
-
 export const getUsersCardCount = (user: User, listsWithCards: ListWithCards[]): number => {
     return listsWithCards.reduce((totalCount, list) => {
-        const userCardsCount = list.cards.filter((card) => card.idMembers.includes(user.id)).length
-        return totalCount + userCardsCount
-    }, 0)
-}
+        const userCardsCount = list.cards.filter((card) => card.idMembers.includes(user.id)).length;
+        return totalCount + userCardsCount;
+    }, 0);
+};
 
 export const parseHoursToString = (meanInHours: number): string => {
     if (meanInHours > 24) {
-        const meanInDays = meanInHours / 24
+        const meanInDays = meanInHours / 24;
         return `${parseFloat(meanInDays.toFixed(2))} days`;
     }
-
     return `${parseFloat(meanInHours.toFixed(2))} hours`;
-}
+};
 
 export const getUpcomingCards = (listsWithCards: ListWithCards[]): CardWithTimeLeft[] => {
     const now = Date.now();
-
     const allCards = listsWithCards.flatMap((list) => list.cards);
-
     return allCards
-        .filter((card) => new Date(card.due).getTime() > now)
-        .map((card) => ({
-            name: card.name,
-            timeLeftInHours: ((new Date(card.due).getTime() - now) / (1000 * 3600)),
-        }))
-        .sort((a, b) => a.timeLeftInHours - b.timeLeftInHours);
+      .filter((card) => new Date(card.due).getTime() > now)
+      .map((card) => ({
+          name: card.name,
+          timeLeftInHours: ((new Date(card.due).getTime() - now) / (1000 * 3600)),
+      }))
+      .sort((a, b) => a.timeLeftInHours - b.timeLeftInHours);
 };
 
 export const countActionsInLastDays = (actions: Action[], days: number): number => {
     const now = Date.now();
     const daysAgo = now - days * 24 * 60 * 60 * 1000;
-
     return actions.filter((action) => {
         const actionDate = new Date(action.date).getTime();
         return actionDate >= daysAgo && actionDate <= now;
     }).length;
 };
 
-export const prepareMetrics = (listsWithCards: ListWithCards[], updateActions: Action[], createActions: Action[]): Metrics => {
-    const now = Date.now();
-
-    // Active Cards: Cards in "To Do", "In Progress", or "In Review" lists
-    const totalActiveCards = listsWithCards
+const getTotalActiveCards = (listsWithCards: ListWithCards[]): number => {
+    return listsWithCards
       .filter((list) => ["To Do", "In Progress", "In Review"].includes(list.name))
       .reduce((total, list) => total + list.cards.length, 0);
+};
 
-    const completedActions = updateActions.filter(
-      (action) => action.data.listAfter?.name === "To"
-    );
+const getAverageTaskCompletionTime = (createActions: Action[], updateActions: Action[]): string => {
+    return parseHoursToString(getSumOfMeanTimes(["To Do", 'In Progress'], createActions, updateActions) || 0);
+};
 
-    // Average Time Tasks spend in To Do + In Review
-    const averageTaskCompletionTime = parseHoursToString(getSumOfMeanTimes(["To Do", 'In Progress'], createActions, updateActions) || 0);
-
-    // Pending Tasks: Cards with due dates in the past and not completed
-    const pendingTasks = listsWithCards.flatMap((list) =>
+const getPendingTasks = (listsWithCards: ListWithCards[]): number => {
+    const now = Date.now();
+    return listsWithCards.flatMap((list) =>
       list.cards.filter(
         (card) => card.due && new Date(card.due).getTime() < now && !card.dueComplete
       )
     ).length;
+};
 
-    // Total Completed Cards: Cards in the "Done" list
-    const totalCompletedCards = listsWithCards
+const getTotalCompletedCards = (listsWithCards: ListWithCards[]): number => {
+    return listsWithCards
       .filter((list) => list.name === "Done")
       .reduce((total, list) => total + list.cards.length, 0);
+};
 
-    // Recent Tasks Done: Extract recent tasks completed and their metadata
-    const recentTasksDone = completedActions.map((action) => ({
+const getRecentTasksDone = (updateActions: Action[]): { cardName: string; completedBy: string; completedOn: string; }[] => {
+    const completedActions = updateActions.filter(
+      (action) => action.data.listAfter?.name === "Done"
+    );
+    return completedActions.map((action) => ({
         cardName: action.data.card.name,
         completedBy: action.memberCreator.fullName,
         completedOn: new Date(action.date).toLocaleDateString(),
     }));
+};
 
+export const prepareAllMetrics = (listsWithCards: ListWithCards[], updateActions: Action[], createActions: Action[]): Metrics => {
     return {
-        totalActiveCards,
-        averageTaskCompletionTime,
-        pendingTasks,
-        totalCompletedCards,
-        recentTasksDone,
+        totalActiveCards: getTotalActiveCards(listsWithCards),
+        averageTaskCompletionTime: getAverageTaskCompletionTime(createActions, updateActions),
+        pendingTasks: getPendingTasks(listsWithCards),
+        totalCompletedCards: getTotalCompletedCards(listsWithCards),
+        recentTasksDone: getRecentTasksDone(updateActions),
     };
 };
 
@@ -111,18 +92,10 @@ type BarGraphData = {
     completed: number;
 }[];
 
-/**
- * Prepares data for the BarGraph component.
- *
- * @param createActions - Array of actions representing card creations.
- * @param updateActions - Array of actions representing card updates.
- * @returns Data formatted for the BarGraph component.
- */
 export function prepareBarGraphData(
   createActions: Action[],
   updateActions: Action[]
 ): BarGraphData {
-    // Helper to format a date as YYYY-MM-DD
     const formatDate = (date: string): string => {
         const d = new Date(date);
         const year = d.getFullYear();
@@ -131,7 +104,6 @@ export function prepareBarGraphData(
         return `${year}-${month}-${day}`;
     };
 
-    // Helper to check if a date is in the current month
     const isInCurrentMonth = (date: string): boolean => {
         const now = new Date();
         const actionDate = new Date(date);
@@ -141,7 +113,6 @@ export function prepareBarGraphData(
         );
     };
 
-    // Helper to group actions by date
     const groupActionsByDay = (actions: Action[]): Record<string, number> => {
         const grouped: Record<string, number> = {};
         actions.forEach((action) => {
@@ -151,27 +122,21 @@ export function prepareBarGraphData(
         return grouped;
     };
 
-    // Get all dates in the current month
     const getAllDatesInCurrentMonth = (): string[] => {
         const now = new Date();
         const year = now.getFullYear();
         const month = now.getMonth();
-
         const startOfMonth = new Date(year, month, 1);
         const endOfMonth = new Date(year, month + 1, 0);
-
         const dates: string[] = [];
         let currentDate = startOfMonth;
-
         while (currentDate <= endOfMonth) {
             dates.push(formatDate(currentDate.toISOString()));
             currentDate.setDate(currentDate.getDate() + 1);
         }
-
         return dates;
     };
 
-    // Filter actions for the current month
     const createActionsInMonth = createActions.filter((action) =>
       isInCurrentMonth(action.date)
     );
@@ -179,11 +144,9 @@ export function prepareBarGraphData(
       isInCurrentMonth(action.date)
     );
 
-    // Group actions by date
     const createdGrouped = groupActionsByDay(createActionsInMonth);
     const completedGrouped = groupActionsByDay(updateActionsInMonth);
 
-    // Generate data for the bar graph
     const allDates = getAllDatesInCurrentMonth();
     const barGraphData: BarGraphData = allDates.map((date) => ({
         date,
@@ -203,8 +166,8 @@ export function preparePieChartData(listsWithCards: ListWithCards[]) {
     };
 
     return listsWithCards.map((list) => ({
-        table: nameToConfigKey[list.name] || list.name, // Use mapped config key
-        tasks: list.cards.length, // The number of cards in the table
+        table: nameToConfigKey[list.name] || list.name,
+        tasks: list.cards.length,
         fill: `hsl(var(--chart-${Object.keys(nameToConfigKey).indexOf(list.name) + 1}))`
     }));
 }
@@ -217,13 +180,11 @@ export function prepareAreaGraphData(
     listsWithCards.forEach((list) => {
         list.cards.forEach((card) => {
             if (!card.start) return;
-
             try {
                 const startDate = new Date(card.start).toISOString().split("T")[0];
                 if (!dateCounts[startDate]) {
                     dateCounts[startDate] = { frontend: 0, backend: 0, devops: 0 };
                 }
-
                 card.labels.forEach((label) => {
                     const labelNameLower = label.name?.toLowerCase() || "";
                     if (labelNameLower === "frontend") {

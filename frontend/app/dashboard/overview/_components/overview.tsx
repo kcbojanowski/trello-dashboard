@@ -23,15 +23,15 @@ import {UserBoardsDialog} from "@/app/dashboard/overview/_components/UserBoardsD
 import {BoardUsersDialog} from "@/app/dashboard/overview/_components/BoardUsersDialog";
 import {BoardMetricsDialog} from "@/app/dashboard/overview/_components/BoardMetricsDialog";
 import {
-  Metrics, prepareAreaGraphData,
+  prepareAllMetrics, prepareAreaGraphData,
   prepareBarGraphData,
-  prepareMetrics,
   preparePieChartData
 } from '@/app/dashboard/overview/_components/metrics/utils';
 import TotalCardsIcon from '@/components/svg/TotalCardsIcon';
 import AvarageProgressIcon from '@/components/svg/AvarageProgressIcon';
 import UrgentTaskIcon from '@/components/svg/UrgentTaskIcon';
 import TotalCompletedTasksIcon from '@/components/svg/TotalCompletedTasksIcon';
+import { Metrics } from '@/app/types';
 
 export default function OverViewPage() {
   const boardId = '670d662b57cc7ed56ea20c22';
@@ -73,7 +73,7 @@ export default function OverViewPage() {
   };
 
   const metrics = listsWithCards && updateActions && createActions
-    ? prepareMetrics(listsWithCards, updateActions, createActions)
+    ? prepareAllMetrics(listsWithCards, updateActions, createActions)
     : defaultMetrics;
 
   const recentActions = updateActions
@@ -87,8 +87,6 @@ export default function OverViewPage() {
   const pieChartData = listsWithCards ? preparePieChartData(listsWithCards) : [];
 
   const areaGraphData = listsWithCards ? prepareAreaGraphData(listsWithCards) : [];
-
-  console.log(areaGraphData)
 
   return (
     <PageContainer scrollable>

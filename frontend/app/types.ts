@@ -13,6 +13,11 @@ export type Card = {
     labels: { id: string; name: string }[];
 }
 
+export type CardWithTimeLeft = {
+    name: string;
+    timeLeftInHours: number;
+};
+
 export type TrelloList = {
     id: string
     name: string
@@ -47,3 +52,15 @@ export type Action = {
 export type ActionsCount = {
     _value: number
 }
+
+export type Metrics = {
+    totalActiveCards: number;
+    averageTaskCompletionTime: string;
+    pendingTasks: number;
+    totalCompletedCards: number;
+    recentTasksDone: {
+        cardName: string;
+        completedBy: string;
+        completedOn: string;
+    }[];
+};
