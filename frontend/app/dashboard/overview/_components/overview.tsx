@@ -23,7 +23,7 @@ import {UserBoardsDialog} from "@/app/dashboard/overview/_components/UserBoardsD
 import {BoardUsersDialog} from "@/app/dashboard/overview/_components/BoardUsersDialog";
 import {BoardMetricsDialog} from "@/app/dashboard/overview/_components/BoardMetricsDialog";
 import {
-  Metrics,
+  Metrics, prepareAreaGraphData,
   prepareBarGraphData,
   prepareMetrics,
   preparePieChartData
@@ -85,6 +85,10 @@ export default function OverViewPage() {
     : [];
 
   const pieChartData = listsWithCards ? preparePieChartData(listsWithCards) : [];
+
+  const areaGraphData = listsWithCards ? prepareAreaGraphData(listsWithCards) : [];
+
+  console.log(areaGraphData)
 
   return (
     <PageContainer scrollable>
@@ -175,7 +179,7 @@ export default function OverViewPage() {
                 </CardContent>
               </Card>
               <div className="col-span-4">
-                <AreaGraph />
+                <AreaGraph chartData={areaGraphData}/>
               </div>
               <div className="col-span-4 md:col-span-3">
                 <PieGraph chartData={pieChartData}/>

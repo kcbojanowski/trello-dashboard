@@ -208,3 +208,45 @@ export function preparePieChartData(listsWithCards: ListWithCards[]) {
         fill: `hsl(var(--chart-${Object.keys(nameToConfigKey).indexOf(list.name) + 1}))`
     }));
 }
+
+export function prepareAreaGraphData(
+  listsWithCards: ListWithCards[]
+): { date: string; frontend: number; backend: number; devops: number }[] {
+    const dateCounts: Record<string, { frontend: number; backend: number; devops: number }> = {};
+
+    listsWithCards.forEach((list) => {
+        list.cards.forEach((card) => {
+            if (!card.start) return;
+
+            try {
+                const startDate = new Date(card.start).toISOString().split("T")[0];
+                if (!dateCounts[startDate]) {
+                    dateCounts[startDate] = { frontend: 0, backend: 0, devops: 0 };
+                }
+
+                card.labels.forEach((label) => {
+                    const labelNameLower = label.name?.toLowerCase() || "";
+                    if (labelNameLower === "frontend") {
+                        dateCounts[startDate].frontend += 1;
+                    } else if (labelNameLower === "backend") {
+                        dateCounts[startDate].backend += 1;
+                    } else if (labelNameLower === "devops") {
+                        dateCounts[startDate].devops += 1;
+                    }
+                });
+            } catch (error) {
+                console.error(`Error processing card: ${card.id}`, error);
+            }
+        });
+    });
+
+    return Object.entries(dateCounts)
+      .map(([date, counts]) => {
+          if (!date) {
+              console.warn("Undefined date detected in dateCounts");
+              return { date: "", frontend: 0, backend: 0, devops: 0 };
+          }
+          return { date, ...counts };
+      })
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+}

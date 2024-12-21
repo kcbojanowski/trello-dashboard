@@ -10,6 +10,7 @@ export type Card = {
     due: string
     dueComplete: boolean
     idMembers: string[]
+    labels: { id: string; name: string }[];
 }
 
 export type TrelloList = {
