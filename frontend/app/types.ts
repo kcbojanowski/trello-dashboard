@@ -33,6 +33,7 @@ export type ActionData = {
     card: Card
     listBefore: TrelloList
     listAfter: TrelloList
+    list: TrelloList
 }
 
 export type Action = {
